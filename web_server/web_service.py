@@ -64,6 +64,32 @@ def create_handler_class(q, logs_directory=None):
             response = self._dispatch(request)
             self._send_response(response)
 
+        def do_PUT(self):
+            try:
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length)
+                json_data = self._get_response_dict(post_data)
+            except KeyError as e:
+                json_data = None
+
+            url_parts = self.path.split("/")
+            try:
+                update_entity_id = int(url_parts[-1])
+                path = "/".join(url_parts[0:-1]) + "/"
+            except ValueError as e:
+                update_entity_id = None
+                path = self.path
+
+            request = Request(
+                path,
+                "PUT",
+                json_data,
+                update_entity_id=update_entity_id
+            )
+
+            response = self._dispatch(request)
+            self._send_response(response)
+
         def _get_response_dict(self, post_data):
             post_data_str = post_data.decode('UTF-8')
             return json.loads(post_data_str)

@@ -3,10 +3,11 @@ import json
 
 class Request(object):
 
-    def __init__(self, path, method, data=None):
+    def __init__(self, path, method, data=None, **kwargs):
         self.path = path
         self.method = method
         self.data = data
+        self.meta = kwargs
 
         if not self.data:
             self.data = {}
@@ -15,7 +16,6 @@ class Request(object):
 class Response(object):
 
     def __init__(self, code=200, message=None):
-
         self.code = code
         self.message = message if message is not None else ""
         self.headers = {"Content-Type": "text/plain"}
