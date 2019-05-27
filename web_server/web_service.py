@@ -17,12 +17,12 @@ logger = logging.getLogger(__name__)
 BaseHTTPRequestHandler = SimpleHTTPServer.SimpleHTTPRequestHandler
 
 
-def create_handler_class(q, logs_directory=None):
+def create_handler_class(ps, logs_directory=None):
     class QueueHandler(BaseHTTPRequestHandler, object):
 
         def __init__(self, request, client_address, server):
             super(QueueHandler, self).__init__(request, client_address, server)
-            self.q = q
+            self.persistent_store = ps
 
             if logs_directory:
                 request_log_path = os.path.join(logs_directory, "request.log")
@@ -100,7 +100,7 @@ def create_handler_class(q, logs_directory=None):
         def _dispatch(self, request):
             try:
                 controller = URL_CONFIG[request.path]
-                return controller(request)
+                return controller(request, persistent_store=self.persistent_store)
             except KeyError as e:
                 return Response(
                     404,
@@ -114,7 +114,7 @@ def create_handler_class(q, logs_directory=None):
     return QueueHandler
 
 
-def run(q, port, logs_directory):
+def run(ps, port, logs_directory):
 
     logger.setLevel(logging.INFO)
 
@@ -132,5 +132,7 @@ def run(q, port, logs_directory):
 
 
 if __name__ == "__main__":
-    q = multiprocessing.Queue()
-    run(q, 9999, None)
+    manager = multiprocessing.Manager()
+    persistent_store = manager.dict()
+
+    run(persistent_store, 9999, None)
