@@ -134,14 +134,14 @@ def create_handler_class(ps, logs_directory=None):
     return QueueHandler
 
 
-def run(ps, port, logs_directory):
+def run(ps, port, logs_directory=None):
 
     logger.setLevel(logging.INFO)
 
     if not logs_directory:
         logger.addHandler(logging.StreamHandler(sys.stdout))
     else:
-        log_path = os.path.join(args.logs_directory, "mailer.log")
+        log_path = os.path.join(logs_directory, "web_service.log")
         logger.addHandler(logging.FileHandler(log_path))
 
     server_address = ('', port)

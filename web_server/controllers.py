@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from headless_api.gst_portal_mapper import GSTPortalMapper
 from headless_api.exceptions import LoginException
@@ -26,14 +27,17 @@ def captcha(request, **kwargs):
 
     gpm = GSTPortalMapper()
     base64 = gpm.get_captcha_base64()
+    ts = datetime.now()
 
     ps[gpm.driver.session_id] = {
-        "session_url": gpm.driver.command_executor._url
+        "session_url": gpm.driver.command_executor._url,
+        "ts": ts
     }
 
     response_data = {
         "token": gpm.driver.session_id,
-        "captcha_base64": base64
+        "captcha_base64": base64,
+        "ts": ts.strftime("%Y-%m-%d %H:%M")
     }
 
     return JsonResponse(200, "Token generated", response_data)
