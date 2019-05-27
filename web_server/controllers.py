@@ -7,7 +7,6 @@ from headless_api.entities import BrowserSession
 from web_server.entities import Response, JsonResponse
 
 
-
 def ping(request, **kwargs):
     if request.method == "GET":
         return JsonResponse(200, "PING OK", request.data)

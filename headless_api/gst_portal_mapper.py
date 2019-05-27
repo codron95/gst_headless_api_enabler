@@ -82,7 +82,9 @@ class GSTPortalMapper(object):
 
     def get_captcha_base64(self):
         self._get_captcha_image()
-        return base64.b64encode(self.captcha_image.tobytes())
+        buffer = BytesIO()
+        self.captcha_image.save(buffer, format="PNG")
+        return base64.b64encode(buffer.getvalue())
 
     def save_captcha_image(self, path):
         self._get_captcha_image()
