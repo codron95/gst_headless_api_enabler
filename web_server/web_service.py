@@ -99,8 +99,26 @@ def create_handler_class(ps, logs_directory=None):
 
         def _dispatch(self, request):
             try:
-                controller = URL_CONFIG[request.path]
-                return controller(request, persistent_store=self.persistent_store)
+                url_object = URL_CONFIG[request.path]
+                controller = url_object.controller
+                allowed_methods = url_object.allowed_methods
+
+                if not allowed_methods:
+                    return controller(
+                        request,
+                        persistent_store=ps
+                    )
+
+                if request.method not in allowed_methods:
+                    return Response(
+                        405,
+                        "Method not supported."
+                    )
+
+                return controller(
+                    request,
+                    persistent_store=ps
+                )
             except KeyError as e:
                 return Response(
                     404,
@@ -126,7 +144,7 @@ def run(ps, port, logs_directory):
 
     server_address = ('', port)
 
-    handler_class = create_handler_class(q, logs_directory)
+    handler_class = create_handler_class(ps, logs_directory)
     httpd = SocketServer.TCPServer(server_address, handler_class)
     httpd.serve_forever()
 

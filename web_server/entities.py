@@ -47,3 +47,13 @@ class JsonResponse(Response):
         content['data'] = self.data
         content['errors'] = self.errors
         return json.dumps(content)
+
+
+class URL(object):
+
+    def __init__(self, controller, **kwargs):
+
+        self.controller = controller
+        self.allowed_methods = []
+        if kwargs['allowed_methods']:
+            self.allowed_methods = kwargs['allowed_methods']

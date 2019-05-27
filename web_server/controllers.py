@@ -3,7 +3,7 @@ from web_server.entities import Response, JsonResponse
 from headless_api.gst_portal_mapper import GSTPortalMapper
 
 
-def ping(request):
+def ping(request, **kwargs):
     if request.method == "GET":
         return JsonResponse(200, "PING OK", request.data)
 
