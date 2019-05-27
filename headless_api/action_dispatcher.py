@@ -13,27 +13,27 @@ class ActionDispatcher(object):
             ("DROPDOWN_ELEMENT", {
                 "xpath": "/html/body/div[1]/ng-include[1]/header/div[2]/div/div/ul/li[1]/div/a",
                 "action": self.click,
-                "delay": 0
+                "delay": 3
             }),
             ("PROFILE_ELEMENT", {
                 "xpath": "/html/body/div[1]/ng-include[1]/header/div[2]/div/div/ul/li[1]/div/ul/li[2]/a",
                 "action": self.click,
-                "delay": 0
+                "delay": 1
             }),
             ("API_ACCESS", {
                 "xpath": "/html/body/div[2]/div[2]/div/div[2]/div/div/div[1]/div[1]/ul/li[4]/a",
                 "action": self.click,
-                "delay": 2
+                "delay": 3
             }),
             ("ENABLE_RADIO", {
                 "xpath": "//input[@type=\"radio\"][1]",
                 "action": self.click,
-                "delay": 2
+                "delay": 3
             }),
             ("SELECT_ELEMENT", {
                 "xpath": "//select",
                 "action": self.dropdown,
-                "delay": 0
+                "delay": 1
             }),
             ("CONFIRM_BUTTON", {
                 "xpath": "//button[@type=\"submit\"]",
