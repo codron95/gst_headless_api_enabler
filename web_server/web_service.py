@@ -42,6 +42,7 @@ def create_handler_class(ps, logs_directory=None):
                 path = url_parts[0]
             except IndexError as e:
                 qs = None
+                path = self.path
 
             data = None
             if qs:
@@ -74,8 +75,9 @@ def create_handler_class(ps, logs_directory=None):
 
             url_parts = self.path.split("/")
             try:
-                update_entity_id = int(url_parts[-1])
+                update_entity_id = url_parts[-1]
                 path = "/".join(url_parts[0:-1]) + "/"
+                print(path)
             except ValueError as e:
                 update_entity_id = None
                 path = self.path
@@ -102,28 +104,28 @@ def create_handler_class(ps, logs_directory=None):
                 url_object = URL_CONFIG[request.path]
                 controller = url_object.controller
                 allowed_methods = url_object.allowed_methods
-
-                if not allowed_methods:
-                    return controller(
-                        request,
-                        persistent_store=ps
-                    )
-
-                if request.method not in allowed_methods:
-                    return Response(
-                        405,
-                        "Method not supported."
-                    )
-
-                return controller(
-                    request,
-                    persistent_store=ps
-                )
             except KeyError as e:
                 return Response(
                     404,
                     "The end point you requested was not found."
                 )
+
+            if not allowed_methods:
+                return controller(
+                    request,
+                    persistent_store=ps
+                )
+
+            if request.method not in allowed_methods:
+                return Response(
+                    405,
+                    "Method not supported."
+                )
+
+            return controller(
+                request,
+                persistent_store=ps
+            )
 
         def _send_response(self, response):
             self._set_headers(response)

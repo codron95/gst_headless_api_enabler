@@ -19,7 +19,7 @@ class GSTPortalMapper(object):
     CAPTCHA_ERROR = "Enter valid Letters shown"
     USER_PASS_ERROR = "Invalid Username or Password. Please try again."
 
-    def __init__(self):
+    def __init__(self, browser_session=None):
 
         self.captcha_image = None
         self.login_url = "https://services.gst.gov.in/services/login"
@@ -27,8 +27,17 @@ class GSTPortalMapper(object):
         chrome_options = webdriver.ChromeOptions()
         # chrome_options.add_argument('--headless')
 
-        self.driver = webdriver.Chrome(chrome_options=chrome_options)
-        self.driver.implicitly_wait(4)
+        if not browser_session:
+            self.driver = webdriver.Chrome(chrome_options=chrome_options)
+        else:
+            self.driver = webdriver.Remote(
+                command_executor=browser_session.session_url,
+                desired_capabilities={}
+            )
+            self.driver.close()
+            self.driver.session_id = browser_session.session_id
+
+        self.driver.implicitly_wait(2)
 
     def login(self, username, password, captcha):
 
@@ -59,7 +68,7 @@ class GSTPortalMapper(object):
                 raise LoginException("Invalid Captcha", -2)
 
             if GSTPortalMapper.USER_PASS_ERROR in page_source:
-                return LoginException("Invalid Username or password", -3)
+                raise LoginException("Invalid Username or password", -3)
 
             raise LoginException(e, -1)
 
@@ -110,6 +119,9 @@ class GSTPortalMapper(object):
 
         # fill something in username field to reveal captcha
         self.driver.find_element_by_xpath("//*[@id=\"username\"]").send_keys("dummy")
+
+    def cleanup(self):
+        self.driver.quit()
 
     def enable_api_access(self):
 
