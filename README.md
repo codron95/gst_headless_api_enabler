@@ -71,7 +71,7 @@ Runs a headless browser service to automate enabling the API access for GST Port
 ```
 {
   "message": "Login Unsuccessful",
-  "errors": [<reason for login failure [captcha, username or password incorrect]>],
+  "errors": ["<reason for login failure [captcha, username or password incorrect]>"],
   "data": {
     "token": <browser session id>
   }
@@ -81,8 +81,8 @@ Runs a headless browser service to automate enabling the API access for GST Port
 * code: 500
 ```
 {
-  "message": "There was an unexpected error. Please try again later.",
-  "errors": ["There was an unexpected error. Please try again later."],
+  "message": "<step failed on (login or enable api)>",
+  "errors": ["<step failed on (login or enable api)>"],
   "data": {
     "token": <browser session id>
   }
