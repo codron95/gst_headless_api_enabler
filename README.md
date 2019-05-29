@@ -88,3 +88,10 @@ Runs a headless browser service to automate enabling the API access for GST Port
   }
 }
 ```
+
+# General Workflow
+* Initiate the GET captcha call and keep the token.
+* Show the captcha image to user using the base64 returned.
+* Get captcha input from user along with username and password.
+* Initiate the PUT call to the token previously stored with the data collected in the previous step.
+* In case of any error, re-initiate from step 1 on account of captcha change on every reload of login page in backend headless browser session.
