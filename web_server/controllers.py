@@ -69,7 +69,7 @@ def enable_api(request, **kwargs):
                 500,
                 "Login Unsuccessful",
                 {"token": token},
-                [str(e)]
+                ["Login Unsuccessful"]
             )
 
         return JsonResponse(
@@ -86,7 +86,7 @@ def enable_api(request, **kwargs):
             500,
             "Error while enabling API access",
             {"token": token},
-            [str(e)]
+            ["Error while enabling API access"]
         )
 
     # cleanup the gpm object
