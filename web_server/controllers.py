@@ -1,6 +1,8 @@
 import uuid
 from datetime import datetime
 
+from selenium.common.exceptions import TimeoutException
+
 from headless_api.gst_portal_mapper import GSTPortalMapper
 from headless_api.exceptions import LoginException
 from headless_api.entities import BrowserSession
@@ -81,12 +83,12 @@ def enable_api(request, **kwargs):
 
     try:
         gpm.enable_api_access()
-    except Exception as e:
+    except TimeoutException as e:
         return JsonResponse(
             500,
-            "Error while enabling API access",
+            "Error. Timed Out.",
             {"token": token},
-            ["Error while enabling API access"]
+            ["Error. Timed Out."]
         )
 
     # cleanup the gpm object
