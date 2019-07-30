@@ -10,6 +10,7 @@ from memory_corrector.memory_corrector import stale_check
 
 logger = logging.getLogger(__name__)
 
+
 def get_arguments():
 
     parser = argparse.ArgumentParser()
@@ -18,7 +19,7 @@ def get_arguments():
         help="port for http server to bind to"
     )
     parser.add_argument(
-        '-mcd', '--memory-corrector-delay', nargs='?', default=30, type=int,
+        '-mcd', '--memory-corrector-delay', nargs='?', default=900, type=int,
         help="Delay between picking up queued mail items"
     )
     parser.add_argument(
@@ -26,6 +27,7 @@ def get_arguments():
         help="Custom Logs Directory that should be passed to write the logs to that location "
     )
     return parser.parse_args()
+
 
 if __name__ == '__main__':
 
