@@ -67,23 +67,32 @@ def enable_api(request, **kwargs):
         gpm.login(username, password, captcha)
     except LoginException as e:
         # cleanup the gpm object
-        gpm.cleanup()
 
-        # Delete reference to it from our persistent_store to clear memory
-        del ps[token]
+        captcha_base64 = gpm.get_captcha_base64()
+
+        ps[token]['captcha_base64'] = captcha_base64
+        ps[token]['ts'] = datetime.now()
 
         if e.code == -1:
             return JsonResponse(
                 500,
                 "Login Unsuccessful",
-                {"token": token},
+                {
+                    "token": token,
+                    "captcha_base64": captcha_base64,
+                    "ts": datetime.now().strftime("%Y-%m-%d %H:%M")
+                },
                 ["Login Unsuccessful"]
             )
 
         return JsonResponse(
             400,
             "Login Unsuccessful",
-            {"token": token},
+            {
+                "token": token,
+                "captcha_base64": captcha_base64,
+                "ts": datetime.now().strftime("%Y-%m-%d %H:%M")
+            },
             [str(e)]
         )
 
