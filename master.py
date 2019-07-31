@@ -19,7 +19,7 @@ def get_arguments():
         help="port for http server to bind to"
     )
     parser.add_argument(
-        '-mcd', '--memory-corrector-delay', nargs='?', default=900, type=int,
+        '-mcd', '--memory-corrector-delay', nargs='?', default=240, type=int,
         help="Delay between picking up queued mail items"
     )
     parser.add_argument(
