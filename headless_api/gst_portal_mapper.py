@@ -1,3 +1,4 @@
+import time
 import base64
 from selenium import webdriver
 from PIL import Image
@@ -26,18 +27,18 @@ class GSTPortalMapper(object):
 
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--window-size=1920,1080")
         chrome_options.add_argument("--start-maximized")
+        chrome_options.add_argument("--window-size=1200,1100")
+        chrome_options.add_argument("--disable-extensions")
+        chrome_options.add_argument("--disable-infobars")
 
         if not browser_session:
             self.driver = webdriver.Chrome(chrome_options=chrome_options)
         else:
-            self.driver = webdriver.Remote(
-                command_executor=browser_session.session_url,
-                desired_capabilities={}
-            )
+            self.driver = webdriver.Chrome(chrome_options=chrome_options)
             self.driver.close()
             self.driver.session_id = browser_session.session_id
+            self.driver.command_executor._url = browser_session.session_url
 
         self.driver.implicitly_wait(2)
 
@@ -56,7 +57,7 @@ class GSTPortalMapper(object):
         self.driver.find_element_by_xpath("//button[@type=\"submit\"]").click()
 
         try:
-            element = WebDriverWait(self.driver, 5).until(
+            WebDriverWait(self.driver, 5).until(
                 EC.presence_of_element_located(
                     (
                         By.XPATH,
@@ -97,6 +98,8 @@ class GSTPortalMapper(object):
         self.driver.get(self.login_url)
 
         self._reveal_captcha()
+
+        time.sleep(1)
 
         captcha_element = self.driver.find_element_by_xpath('//*[@id="imgCaptcha"]')
         captcha_location = captcha_element.location
