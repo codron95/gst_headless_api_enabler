@@ -134,6 +134,10 @@ def create_handler_class(ps, logs_directory=None):
     return QueueHandler
 
 
+class ThreadedHTTPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
+    pass
+
+
 def run(ps, port, logs_directory=None):
 
     logger.setLevel(logging.INFO)
@@ -147,7 +151,7 @@ def run(ps, port, logs_directory=None):
     server_address = ('', port)
 
     handler_class = create_handler_class(ps, logs_directory)
-    httpd = SocketServer.TCPServer(server_address, handler_class)
+    httpd = ThreadedHTTPServer(server_address, handler_class)
     httpd.serve_forever()
 
 
