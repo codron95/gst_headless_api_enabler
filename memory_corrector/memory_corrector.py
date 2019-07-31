@@ -1,3 +1,4 @@
+import os
 import sys
 import logging
 import time
@@ -10,7 +11,7 @@ from headless_api.entities import BrowserSession
 logger = logging.getLogger(__name__)
 
 
-def stale_check(ps, check_interval=30, logs_directory=None):
+def stale_check(ps, check_interval, logs_directory=None):
 
     logger.setLevel(logging.INFO)
 
@@ -30,8 +31,9 @@ def stale_check(ps, check_interval=30, logs_directory=None):
             ts = data['ts']
 
             t_delta = ts_now - ts
-            if t_delta.total_seconds() > 900:
+            if t_delta.total_seconds() > 300:
                 session_url = data['session_url']
+
                 browser_session = BrowserSession(
                     session_url,
                     token
