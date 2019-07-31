@@ -1,4 +1,3 @@
-import uuid
 from datetime import datetime
 
 from selenium.common.exceptions import TimeoutException
@@ -7,7 +6,7 @@ from headless_api.gst_portal_mapper import GSTPortalMapper
 from headless_api.exceptions import LoginException
 from headless_api.entities import BrowserSession
 
-from web_server.entities import Response, JsonResponse
+from web_server.entities import JsonResponse
 
 
 def ping(request, **kwargs):
@@ -61,11 +60,18 @@ def enable_api(request, **kwargs):
             {"token": token},
             ["Token not found"]
         )
+
     gpm = GSTPortalMapper(browser_session)
 
     try:
         gpm.login(username, password, captcha)
     except LoginException as e:
+        # cleanup the gpm object
+        gpm.cleanup()
+
+        # Delete reference to it from our persistent_store to clear memory
+        del ps[token]
+
         if e.code == -1:
             return JsonResponse(
                 500,
@@ -84,6 +90,12 @@ def enable_api(request, **kwargs):
     try:
         gpm.enable_api_access()
     except TimeoutException as e:
+        # cleanup the gpm object
+        gpm.cleanup()
+
+        # Delete reference to it from our persistent_store to clear memory
+        del ps[token]
+
         return JsonResponse(
             500,
             "Error. Timed Out.",
