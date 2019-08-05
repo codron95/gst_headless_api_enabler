@@ -7,8 +7,11 @@ Runs a headless browser service to automate enabling the API access for GST Port
   * Exposes end points for fetching captcha and enabling API access.
   * Stores and retrieves browser sessions stored in persistent memory store as required.
   * Terminates the browser session post the enable API call.
+  * Marks sessions dirty according to time to live passed to the service. Default: 4 mins.
+  * Extends sessions if there was problem logging in and new captcha is returned.
+  * Forks memory collector in each request dispatch cycle subject to condition that expired sessions are available.
 * Memory Corrector
-  * Take the responsibility of clearing stale tokens from persistent store.
+  * Take the responsibility of clearing selenium browser instances from memory.
   
   
 ### Architecture
@@ -73,7 +76,9 @@ Runs a headless browser service to automate enabling the API access for GST Port
   "message": "Login Unsuccessful",
   "errors": ["<reason for login failure [captcha, username or password incorrect]>"],
   "data": {
-    "token": <browser session id>
+    "token": <browser session id>,
+    "captcha_base64": <captcha>,
+    "ts": <timestamp>
   }
 }
 ```
@@ -94,4 +99,12 @@ Runs a headless browser service to automate enabling the API access for GST Port
 * Show the captcha image to user using the base64 returned.
 * Get captcha input from user along with username and password.
 * Initiate the PUT call to the token previously stored with the data collected in the previous step.
-* In case of any error, re-initiate from step 1 on account of captcha change on every reload of login page in backend headless browser session.
+* In case of 400 error, show the new captcha to user and repeat PUT call.
+* In case of 404 and 500 error, re-initiate from step 1 on account of captcha change on every reload of login page in backend headless browser session.
+
+### Run the service
+```
+python master.py -ttl <time_to_live>
+```
+* Time to live is the time for browser sessions
+For information on other parameters, run python master.py --help
