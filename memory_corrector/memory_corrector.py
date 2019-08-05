@@ -1,17 +1,17 @@
 import os
 import sys
 import logging
-import time
 from datetime import datetime
 
+from urllib3.exceptions import MaxRetryError
+
 from headless_api.gst_portal_mapper import GSTPortalMapper
-from headless_api.entities import BrowserSession
 
 
 logger = logging.getLogger(__name__)
 
 
-def stale_check(ps, check_interval, logs_directory=None):
+def destroy_sessions(expired_drivers, logs_directory=None):
 
     logger.setLevel(logging.INFO)
 
@@ -21,26 +21,18 @@ def stale_check(ps, check_interval, logs_directory=None):
         log_path = os.path.join(logs_directory, "memory_corrector.log")
         logger.addHandler(logging.FileHandler(log_path))
 
-    while 1:
-        ts_now = datetime.now()
-        logger.info("Running stale check at: {}".format(
-            ts_now.strftime("%Y-%m-%d %H:%M")
-        ))
+    ts_now = datetime.now()
+    logger.info("Forked memory corrector at: {}".format(
+        ts_now.strftime("%Y-%m-%d %H:%M")
+    ))
 
-        for token, data in ps.items():
-            ts = data['ts']
+    for token, driver in expired_drivers.items():
 
-            t_delta = ts_now - ts
-            if t_delta.total_seconds() > 300:
-                session_url = data['session_url']
-
-                browser_session = BrowserSession(
-                    session_url,
-                    token
-                )
-                gpm = GSTPortalMapper(browser_session)
-                gpm.cleanup()
-                del ps[token]
-                logger.info("Wiped token: {}".format(token))
-
-        time.sleep(check_interval)
+        try:
+            gpm = GSTPortalMapper(expired_drivers[token])
+        except MaxRetryError:
+            pass
+        else:
+            gpm.cleanup()
+        finally:
+            logger.info("Wiped token: {}".format(token))
