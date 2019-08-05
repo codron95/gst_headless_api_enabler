@@ -107,4 +107,4 @@ Runs a headless browser service to automate enabling the API access for GST Port
 python master.py -ttl <time_to_live>
 ```
 * Time to live is the time for browser sessions
-For information on other parameters, run python master.py --help
+For information on other parameters, run ```python master.py --help```
