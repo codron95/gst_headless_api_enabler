@@ -42,7 +42,7 @@ def create_handler_class(drivers, time_to_live, logs_directory=None):
                 url_parts = self.path.split("?")
                 qs = url_parts[1]
                 path = url_parts[0]
-            except IndexError as e:
+            except IndexError:
                 qs = None
                 path = self.path
 
@@ -60,7 +60,7 @@ def create_handler_class(drivers, time_to_live, logs_directory=None):
                 content_length = int(self.headers['Content-Length'])
                 post_data = self.rfile.read(content_length)
                 json_data = self._get_response_dict(post_data)
-            except KeyError as e:
+            except KeyError:
                 json_data = None
 
             request = Request(self.path, "POST", json_data)
@@ -72,14 +72,14 @@ def create_handler_class(drivers, time_to_live, logs_directory=None):
                 content_length = int(self.headers['Content-Length'])
                 post_data = self.rfile.read(content_length)
                 json_data = self._get_response_dict(post_data)
-            except KeyError as e:
+            except KeyError:
                 json_data = None
 
             url_parts = self.path.split("/")
             try:
                 update_entity_id = url_parts[-1]
                 path = "/".join(url_parts[0:-1]) + "/"
-            except ValueError as e:
+            except ValueError:
                 update_entity_id = None
                 path = self.path
 
