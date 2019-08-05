@@ -25,6 +25,7 @@ ppft==1.6.4.9
 pycodestyle==2.5.0
 pyflakes==2.1.1
 pyzmq==18.0.2
+redis==3.3.5
 requests==2.22.0
 selenium==3.141.0
 six==1.12.0
