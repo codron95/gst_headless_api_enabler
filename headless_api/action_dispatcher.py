@@ -53,7 +53,7 @@ class ActionDispatcher(object):
         delay = self.DISPATCH_INFO[key]["delay"]
 
         try:
-            element = WebDriverWait(self.driver, 10).until(
+            WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located(
                     (
                         By.XPATH,
@@ -69,8 +69,6 @@ class ActionDispatcher(object):
         action(xpath)
 
     def dispatch_all(self):
-        dispatch_all_success = False
-
         keys = self.DISPATCH_INFO.keys()
         for key in keys:
             try:
