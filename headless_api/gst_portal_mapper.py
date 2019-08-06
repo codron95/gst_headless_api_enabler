@@ -1,3 +1,4 @@
+import time
 import base64
 from selenium import webdriver
 from PIL import Image
@@ -16,6 +17,7 @@ from .action_dispatcher import ActionDispatcher
 class GSTPortalMapper(object):
 
     LOGIN_CONDITION_ELEMENT_XPATH = "//*[text()=\"Annual Return\"]"
+    USERNAME_FIELD_XPATH = "//*[@id=\"username\"]"
     CAPTCHA_ERROR = "Enter valid Letters shown"
     USER_PASS_ERROR = "Invalid Username or Password. Please try again."
 
@@ -26,20 +28,16 @@ class GSTPortalMapper(object):
 
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--window-size=1920,1080")
         chrome_options.add_argument("--start-maximized")
+        chrome_options.add_argument("--window-size=1200,1100")
+        chrome_options.add_argument("--disable-extensions")
+        chrome_options.add_argument("--disable-infobars")
 
         if not browser_session:
             self.driver = webdriver.Chrome(chrome_options=chrome_options)
+            self.driver.implicitly_wait(2)
         else:
-            self.driver = webdriver.Remote(
-                command_executor=browser_session.session_url,
-                desired_capabilities={}
-            )
-            self.driver.close()
-            self.driver.session_id = browser_session.session_id
-
-        self.driver.implicitly_wait(2)
+            self.driver = browser_session
 
     def login(self, username, password, captcha):
 
@@ -56,7 +54,7 @@ class GSTPortalMapper(object):
         self.driver.find_element_by_xpath("//button[@type=\"submit\"]").click()
 
         try:
-            element = WebDriverWait(self.driver, 5).until(
+            WebDriverWait(self.driver, 5).until(
                 EC.presence_of_element_located(
                     (
                         By.XPATH,
@@ -96,7 +94,18 @@ class GSTPortalMapper(object):
 
         self.driver.get(self.login_url)
 
-        self._reveal_captcha()
+        username_element = WebDriverWait(self.driver, 5).until(
+            EC.presence_of_element_located(
+                (
+                    By.XPATH,
+                    GSTPortalMapper.USERNAME_FIELD_XPATH
+                )
+            )
+        )
+
+        self._reveal_captcha(username_element)
+
+        time.sleep(1)
 
         captcha_element = self.driver.find_element_by_xpath('//*[@id="imgCaptcha"]')
         captcha_location = captcha_element.location
@@ -119,10 +128,10 @@ class GSTPortalMapper(object):
         cropped_image = image.crop((left, top, right, bottom))
         return cropped_image
 
-    def _reveal_captcha(self):
+    def _reveal_captcha(self, username_element):
 
         # fill something in username field to reveal captcha
-        self.driver.find_element_by_xpath("//*[@id=\"username\"]").send_keys("dummy")
+        username_element.send_keys("dummy")
 
     def cleanup(self):
         self.driver.quit()
