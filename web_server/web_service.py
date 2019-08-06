@@ -10,9 +10,11 @@ from datetime import datetime
 import multiprocessing
 
 from web_server.url_config import URL_CONFIG
-from web_server.entities import Response, Request
+from web_server.entities import JsonResponse, Request
 
 from memory_corrector.memory_corrector import destroy_sessions
+
+from urllib3.exceptions import MaxRetryError, ProtocolError
 
 logger = logging.getLogger(__name__)
 
@@ -106,27 +108,61 @@ def create_handler_class(drivers, time_to_live, logs_directory=None):
                 controller = url_object.controller
                 allowed_methods = url_object.allowed_methods
             except KeyError:
-                return Response(
+                logger.info("{request} failed: {reason}".format(
+                    request=request,
+                    reason="The end point you requested was not found."
+                ))
+
+                return JsonResponse(
                     404,
                     "The end point you requested was not found."
                 )
 
             if not allowed_methods:
-                return controller(
-                    request,
-                    drivers=drivers,
-                )
+                try:
+                    return controller(
+                        request,
+                        drivers=drivers,
+                        time_to_live=time_to_live,
+                    )
+                except Exception as e:
+                    logger.info("{request} failed: {reason}".format(
+                        request=request,
+                        reason=e
+                    ))
+
+                    return JsonResponse(
+                        500,
+                        "Unexpected Error occured while processing your request."
+                    )
 
             if request.method not in allowed_methods:
-                return Response(
+                logger.info("{request} failed: {reason}".format(
+                    request=request,
+                    reason="Method not supported."
+                ))
+
+                return JsonResponse(
                     405,
                     "Method not supported."
                 )
 
-            return controller(
-                request,
-                drivers=drivers,
-            )
+            try:
+                return controller(
+                    request,
+                    drivers=drivers,
+                    time_to_live=time_to_live,
+                )
+            except Exception as e:
+                logger.info("{request} failed: {reason}".format(
+                    request=request,
+                    reason=e
+                ))
+
+                return JsonResponse(
+                    500,
+                    "Unexpected Error occured while processing your request."
+                )
 
         def _send_response(self, response):
             self._set_headers(response)
