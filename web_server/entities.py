@@ -12,6 +12,18 @@ class Request(object):
         if not self.data:
             self.data = {}
 
+    def __str__(self):
+        return "{method} {path}".format(
+            method=self.method,
+            path=self.path
+        )
+
+    def __repr__(self):
+        return "{method} /{path}".format(
+            method=self.method,
+            path=self.path
+        )
+
 
 class Response(object):
 
