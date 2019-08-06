@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from selenium.common.exceptions import TimeoutException
 
@@ -57,6 +57,7 @@ def enable_api(request, **kwargs):
 
     token = request.meta['update_entity_id']
     drivers = kwargs['drivers']
+    time_to_live = kwargs['time_to_live']
 
     username = request.data['username']
     password = request.data['password']
@@ -92,7 +93,7 @@ def enable_api(request, **kwargs):
 
         ts = datetime.now()
         captcha_base64 = gpm.get_captcha_base64()
-        drivers[token]['ts'] = ts
+        drivers[token]['ts'] = ts - timedelta(seconds=time_to_live) + timedelta(seconds=120)
         drivers[token]['lock'] = False
 
         return JsonResponse(
