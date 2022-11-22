@@ -19,7 +19,7 @@ mccabe==0.6.1
 msgpack==0.6.1
 multiprocess==0.70.7
 pathos==0.2.3
-Pillow==6.0.0
+Pillow==9.3.0
 pox==0.2.5
 ppft==1.6.4.9
 pycodestyle==2.5.0
